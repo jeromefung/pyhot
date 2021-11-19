@@ -9,6 +9,7 @@ Author: Jerome Fung (jfung@ithaca.edu)
 
 import numpy as np
 import numba
+from numba import jit
 
 class SLM(object):
 
@@ -38,8 +39,19 @@ class SLM(object):
         Calculate hologram using superposition of prisms and lenses.
         '''
 
-        holo_sum = np.zeros((self.nx, self.ny), dtype = np.complex128)
-        
+        #holo_sum = np.zeros((self.nx, self.ny), dtype = np.complex64)
+
+        def Delta_m(pt):
+            Delta_m_lens = np.pi * pt[2] / (self.wavelen * self.f**2) * \
+                (self.xs**2 + self.ys**2)
+            Delta_m_grating = 2 * np.pi / (self.wavelen * self.f) * (
+                self.xs * pt[0] + self.ys * pt[1])
+            return Delta_m_lens + Delta_m_grating
+
+        Delta_ms = np.array([Delta_m(pt) for pt in pts])
+        holo_sum = np.exp(1j * Delta_ms).sum(axis = 0)
+
+        '''
         for pt in pts:
             Delta_m_lens = np.pi * pt[2] / (self.wavelen * self.f**2) * \
                 (self.xs**2 + self.ys**2)
@@ -47,6 +59,7 @@ class SLM(object):
                 self.xs * pt[0] + self.ys * pt[1])
             Delta_m = Delta_m_lens + Delta_m_grating
             holo_sum += np.exp(1j * Delta_m)
+        '''
 
         # np.angle between -pi and pi, shift to 0 to 2 pi 
         holo = np.angle(holo_sum) + np.pi
