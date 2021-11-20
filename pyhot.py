@@ -11,6 +11,8 @@ import numpy as np
 import numba
 from numba import jit
 
+from hologram_lib import calc_holo_spl
+
 class SLM(object):
 
     def __init__(self, nx, ny, px, wavelen, f):
@@ -30,7 +32,7 @@ class SLM(object):
         
     def calc_holo(self, pts, method = 'spl'):
         if method == 'spl':
-            return self._calc_holo_spl(pts)
+            return calc_holo_spl(pts, self.xs, self.ys, self.wavelen, self.f)
         else:
             raise NotImplementedError
 
