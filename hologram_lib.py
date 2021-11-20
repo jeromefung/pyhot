@@ -4,7 +4,7 @@ from numba.types import float64, uint16, int32
 
 
 @jit(uint16[:,:](float64[:,:], float64[:,:], float64[:,:], float64, float64),
-     nopython=True)
+     nopython=True, parallel=True)
 def calc_holo_spl(pts, xs, ys, wavelen, f):
     phase_sum = np.empty_like(xs, dtype = np.complex64)
     
